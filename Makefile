@@ -8,6 +8,11 @@ build:
 	cat buildpacks/*/buildpack* | sed 'N;s/\n/ /' > include/buildpacks.txt
 	go-bindata include
 	mkdir -p build/linux  && GOOS=linux  go build -a -ldflags "-X main.Version=$(VERSION)" -o build/linux/$(NAME)
+ifeq ($(CIRCLECI),true)
+        docker build -t $(IMAGE_NAME):$(BUILD_TAG) .
+else
+        docker build -f Dockerfile.dev -t $(IMAGE_NAME):$(BUILD_TAG) .
+endif
 
 build-in-docker:
 	docker build --rm -f Dockerfile.build -t $(NAME)-build .
@@ -24,10 +29,7 @@ clean:
 	docker rmi herokuish:dev || true
 
 deps:
-	docker pull heroku/cedar:14
-	go get -u github.com/jteeuwen/go-bindata/...
-	go get -u github.com/progrium/gh-release/...
-	go get -u github.com/progrium/basht/...
+	docker pull mainto/armhf-cederish:cedar14
 	go get || true
 
 test:
