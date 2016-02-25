@@ -1,4 +1,4 @@
-FROM mainto/armhf-cedarish :cedar14
+FROM mainto/armhf-cedarish:cedar14
 RUN curl https://github.com/mainto/herokuish/releases/download/v0.3.8/herokuish_0.3.8_linux_armv7l.tgz \
 		--silent -L | tar -xzC /bin
 RUN /bin/herokuish buildpack install \

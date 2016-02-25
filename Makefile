@@ -8,20 +8,6 @@ build:
 	cat buildpacks/*/buildpack* | sed 'N;s/\n/ /' > include/buildpacks.txt
 	go-bindata include
 	mkdir -p build/linux  && GOOS=linux  go build -a -ldflags "-X main.Version=$(VERSION)" -o build/linux/$(NAME)
-ifeq ($(CIRCLECI),true)
-        docker build -t $(IMAGE_NAME):$(BUILD_TAG) .
-else
-        docker build -f Dockerfile.dev -t $(IMAGE_NAME):$(BUILD_TAG) .
-endif
-
-build-in-docker:
-	docker build --rm -f Dockerfile.build -t $(NAME)-build .
-	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro \
-		-v /var/lib/docker:/var/lib/docker \
-		-v ${PWD}:/usr/src/myapp -w /usr/src/myapp \
-		-e IMAGE_NAME=$(IMAGE_NAME) -e BUILD_TAG=$(BUILD_TAG) -e VERSION=master \
-		$(NAME)-build make -e deps build
-	docker rmi $(NAME)-build || true
 
 clean:
 	rm -rf build/*
